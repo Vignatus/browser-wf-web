@@ -7,11 +7,15 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+import { users } from './user.schema';
 
 export const recordings = pgTable(
   'recordings',
   {
     id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
     name: varchar('name', { length: 255 }).notNull(),
     description: text('description'),
     tags: text('tags').array().notNull().default([]),
@@ -23,6 +27,7 @@ export const recordings = pgTable(
     deletedAt: timestamp('deleted_at', { withTimezone: true }),
   },
   (table) => [
+    index('recordings_user_id_idx').on(table.userId),
     index('recordings_status_idx').on(table.status),
     index('recordings_created_at_idx').on(table.createdAt),
   ],

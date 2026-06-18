@@ -1,9 +1,63 @@
 {
-  "id": "5b0ac556-1f62-413c-a4cf-5bef1d8c0a6d",
+  "id": "33c7962c-5220-4826-95a2-2a4db523594c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "users_email_idx": {
+          "name": "users_email_idx",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.recordings": {
       "name": "recordings",
       "schema": "",
@@ -14,6 +68,12 @@
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -76,6 +136,21 @@
         }
       },
       "indexes": {
+        "recordings_user_id_idx": {
+          "name": "recordings_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "recordings_status_idx": {
           "name": "recordings_status_idx",
           "columns": [
@@ -107,7 +182,21 @@
           "with": {}
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "recordings_user_id_users_id_fk": {
+          "name": "recordings_user_id_users_id_fk",
+          "tableFrom": "recordings",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -278,8 +367,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.run_history": {
-      "name": "run_history",
+    "public.replays": {
+      "name": "replays",
       "schema": "",
       "columns": {
         "id": {
@@ -300,13 +389,6 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
-        },
-        "type": {
-          "name": "type",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'replay'"
         },
         "status": {
           "name": "status",
@@ -375,8 +457,8 @@
         }
       },
       "indexes": {
-        "run_history_recording_id_idx": {
-          "name": "run_history_recording_id_idx",
+        "replays_recording_id_idx": {
+          "name": "replays_recording_id_idx",
           "columns": [
             {
               "expression": "recording_id",
@@ -390,8 +472,8 @@
           "method": "btree",
           "with": {}
         },
-        "run_history_version_id_idx": {
-          "name": "run_history_version_id_idx",
+        "replays_version_id_idx": {
+          "name": "replays_version_id_idx",
           "columns": [
             {
               "expression": "version_id",
@@ -405,8 +487,8 @@
           "method": "btree",
           "with": {}
         },
-        "run_history_created_at_idx": {
-          "name": "run_history_created_at_idx",
+        "replays_created_at_idx": {
+          "name": "replays_created_at_idx",
           "columns": [
             {
               "expression": "created_at",
@@ -420,8 +502,8 @@
           "method": "btree",
           "with": {}
         },
-        "run_history_status_idx": {
-          "name": "run_history_status_idx",
+        "replays_status_idx": {
+          "name": "replays_status_idx",
           "columns": [
             {
               "expression": "status",
@@ -437,9 +519,9 @@
         }
       },
       "foreignKeys": {
-        "run_history_recording_id_recordings_id_fk": {
-          "name": "run_history_recording_id_recordings_id_fk",
-          "tableFrom": "run_history",
+        "replays_recording_id_recordings_id_fk": {
+          "name": "replays_recording_id_recordings_id_fk",
+          "tableFrom": "replays",
           "tableTo": "recordings",
           "columnsFrom": [
             "recording_id"
@@ -450,9 +532,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "run_history_version_id_recording_versions_id_fk": {
-          "name": "run_history_version_id_recording_versions_id_fk",
-          "tableFrom": "run_history",
+        "replays_version_id_recording_versions_id_fk": {
+          "name": "replays_version_id_recording_versions_id_fk",
+          "tableFrom": "replays",
           "tableTo": "recording_versions",
           "columnsFrom": [
             "version_id"
@@ -470,8 +552,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.run_events": {
-      "name": "run_events",
+    "public.replay_events": {
+      "name": "replay_events",
       "schema": "",
       "columns": {
         "id": {
@@ -481,8 +563,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "run_id": {
-          "name": "run_id",
+        "replay_id": {
+          "name": "replay_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -521,11 +603,11 @@
         }
       },
       "indexes": {
-        "run_events_run_id_sequence_idx": {
-          "name": "run_events_run_id_sequence_idx",
+        "replay_events_replay_id_sequence_idx": {
+          "name": "replay_events_replay_id_sequence_idx",
           "columns": [
             {
-              "expression": "run_id",
+              "expression": "replay_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -542,11 +624,11 @@
           "method": "btree",
           "with": {}
         },
-        "run_events_run_id_idx": {
-          "name": "run_events_run_id_idx",
+        "replay_events_replay_id_idx": {
+          "name": "replay_events_replay_id_idx",
           "columns": [
             {
-              "expression": "run_id",
+              "expression": "replay_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -559,12 +641,12 @@
         }
       },
       "foreignKeys": {
-        "run_events_run_id_run_history_id_fk": {
-          "name": "run_events_run_id_run_history_id_fk",
-          "tableFrom": "run_events",
-          "tableTo": "run_history",
+        "replay_events_replay_id_replays_id_fk": {
+          "name": "replay_events_replay_id_replays_id_fk",
+          "tableFrom": "replay_events",
+          "tableTo": "replays",
           "columnsFrom": [
-            "run_id"
+            "replay_id"
           ],
           "columnsTo": [
             "id"

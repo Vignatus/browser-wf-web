@@ -1,13 +1,13 @@
 import { index, integer, jsonb, pgTable, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
-import { runHistory } from './run-history.schema';
+import { replays } from './replay.schema';
 
-export const runEvents = pgTable(
-  'run_events',
+export const replayEvents = pgTable(
+  'replay_events',
   {
     id: uuid('id').defaultRandom().primaryKey(),
-    runId: uuid('run_id')
+    replayId: uuid('replay_id')
       .notNull()
-      .references(() => runHistory.id, { onDelete: 'cascade' }),
+      .references(() => replays.id, { onDelete: 'cascade' }),
     sequence: integer('sequence').notNull(),
     type: varchar('type', { length: 64 }).notNull(),
     timestamp: timestamp('timestamp', { withTimezone: true }),
@@ -15,7 +15,7 @@ export const runEvents = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    uniqueIndex('run_events_run_id_sequence_idx').on(table.runId, table.sequence),
-    index('run_events_run_id_idx').on(table.runId),
+    uniqueIndex('replay_events_replay_id_sequence_idx').on(table.replayId, table.sequence),
+    index('replay_events_replay_id_idx').on(table.replayId),
   ],
 );

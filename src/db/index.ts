@@ -7,8 +7,18 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is required');
 }
 
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+const globalForDb = globalThis as typeof globalThis & {
+  browserWfPool?: Pool;
+};
+
+export const pool =
+  globalForDb.browserWfPool ??
+  new Pool({
+    connectionString: process.env.DATABASE_URL,
+  });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForDb.browserWfPool = pool;
+}
 
 export const db = drizzle(pool, { schema });

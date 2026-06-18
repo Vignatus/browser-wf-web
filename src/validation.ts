@@ -13,8 +13,8 @@ export const recordingVersionParamsSchema = z.object({
   versionId: uuidParam,
 });
 
-export const runParamsSchema = z.object({
-  runId: uuidParam,
+export const replayParamsSchema = z.object({
+  replayId: uuidParam,
 });
 
 export const listRecordingsQuerySchema = z.object({
@@ -69,9 +69,8 @@ export const importRecordingSchema = z.object({
   version: createVersionSchema,
 });
 
-export const createRunSchema = z.object({
+export const createReplaySchema = z.object({
   versionId: z.string().uuid().nullable().optional(),
-  type: z.string().trim().min(1).max(32).default('replay'),
   status: z.string().trim().min(1).max(32),
   startedAt: z.coerce.date().nullable().optional(),
   endedAt: z.coerce.date().nullable().optional(),
@@ -82,7 +81,7 @@ export const createRunSchema = z.object({
   metadata: jsonObject.default({}),
 });
 
-export const updateRunSchema = z
+export const updateReplaySchema = z
   .object({
     status: z.string().trim().min(1).max(32).optional(),
     startedAt: z.coerce.date().nullable().optional(),
@@ -95,7 +94,7 @@ export const updateRunSchema = z
   })
   .strict();
 
-export const createRunEventsSchema = z.object({
+export const createReplayEventsSchema = z.object({
   events: z
     .array(
       z.object({
@@ -106,4 +105,9 @@ export const createRunEventsSchema = z.object({
       }),
     )
     .min(1),
+});
+
+export const loginSchema = z.object({
+  email: z.email().max(320),
+  password: z.string().min(1),
 });
