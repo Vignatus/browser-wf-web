@@ -363,12 +363,12 @@ h1 {
 
 .recordings-table th:nth-child(5),
 .recordings-table td:nth-child(5) {
-  width: 11%;
+  width: 18%;
 }
 
 .recordings-table th:nth-child(6),
 .recordings-table td:nth-child(6) {
-  width: 30%;
+  width: 23%;
 }
 
 .recording-name {
@@ -384,6 +384,15 @@ h1 {
   overflow: hidden;
   color: #071124;
   font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recording-description {
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  color: #52617d;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -435,8 +444,6 @@ h1 {
   gap: 8px;
 }
 
-.secondary-action,
-.primary-action,
 .delete-action {
   display: inline-flex;
   align-items: center;
@@ -448,21 +455,6 @@ h1 {
   font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
-}
-
-.secondary-action {
-  min-width: 76px;
-  border: 1px solid #d7dfeb;
-  background: #ffffff;
-  color: #25375f;
-}
-
-.primary-action {
-  min-width: 96px;
-  border: 0;
-  background: #075cff;
-  color: #ffffff;
-  cursor: pointer;
 }
 
 .delete-action {

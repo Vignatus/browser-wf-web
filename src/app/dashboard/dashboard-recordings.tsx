@@ -90,7 +90,7 @@ export function DashboardRecordings({ initialRecordings = [] }: DashboardRecordi
                 <th>Steps</th>
                 <th>Updated <span aria-hidden="true">↓</span></th>
                 <th>Last Replay</th>
-                <th>Status</th>
+                <th>Description</th>
                 <th aria-label="Actions" />
               </tr>
             </thead>
@@ -131,26 +131,12 @@ export function DashboardRecordings({ initialRecordings = [] }: DashboardRecordi
                     <td>{formatDateTime(recording.updatedAt)}</td>
                     <td>{recording.lastReplayAt ? formatDateTime(recording.lastReplayAt) : 'Not run'}</td>
                     <td>
-                      <StatusBadge status={recording.status} />
+                      <span className="recording-description">
+                        {recording.description?.trim() || 'No description'}
+                      </span>
                     </td>
                     <td>
                       <div className="row-actions">
-                        <a
-                          className="secondary-action"
-                          href={`/dashboard?recording=${recording.id}`}
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <PencilIcon />
-                          Edit
-                        </a>
-                        <button
-                          className="primary-action"
-                          type="button"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <PlayIcon />
-                          Replay
-                        </button>
                         <button
                           className="delete-action"
                           type="button"
@@ -234,25 +220,6 @@ function isStepObject(step: unknown): step is DashboardStep {
   return Boolean(step) && typeof step === 'object' && !Array.isArray(step);
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const normalized = status.toLowerCase();
-  const tone = normalized.includes('fail')
-    ? 'failed'
-    : normalized.includes('partial')
-      ? 'partial'
-      : normalized.includes('success') || normalized.includes('pass') || normalized === 'active'
-        ? 'success'
-        : 'neutral';
-  const label = normalized === 'active' ? 'Success' : titleCase(status);
-
-  return (
-    <span className={`status-badge ${tone}`}>
-      <span />
-      {label}
-    </span>
-  );
-}
-
 function StepMeta({ label, value }: { label: string; value: string | undefined }) {
   if (!value) {
     return null;
@@ -316,23 +283,6 @@ function DocumentIcon() {
       <path d="M7 3h7l5 5v13H7z" />
       <path d="M14 3v5h5" />
       <path d="M10 12h5M10 16h7" />
-    </svg>
-  );
-}
-
-function PencilIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 20h4l11-11-4-4L4 16z" />
-      <path d="m13 7 4 4" />
-    </svg>
-  );
-}
-
-function PlayIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m8 5 11 7-11 7z" />
     </svg>
   );
 }
