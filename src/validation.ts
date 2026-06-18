@@ -8,11 +8,6 @@ export const recordingParamsSchema = z.object({
   recordingId: uuidParam,
 });
 
-export const recordingVersionParamsSchema = z.object({
-  recordingId: uuidParam,
-  versionId: uuidParam,
-});
-
 export const replayParamsSchema = z.object({
   replayId: uuidParam,
 });
@@ -36,41 +31,20 @@ export const createRecordingSchema = z.object({
   description: z.string().trim().max(5000).nullable().optional(),
   tags: z.array(z.string().trim().min(1).max(64)).default([]),
   status: z.string().trim().min(1).max(32).default('active'),
+  source: z.string().trim().min(1).max(64).default('extension'),
+  startUrl: z.string().trim().max(4096).nullable().optional(),
+  steps: z.array(z.unknown()).optional(),
+  recordingJson: jsonObject.optional(),
+  rawEventSummary: jsonObject.default({}),
+  validation: jsonObject.default({}),
   metadata: jsonObject.default({}),
-});
+}).passthrough();
 
-export const updateRecordingSchema = z
-  .object({
-    name: z.string().trim().min(1).max(255).optional(),
-    description: z.string().trim().max(5000).nullable().optional(),
-    tags: z.array(z.string().trim().min(1).max(64)).optional(),
-    status: z.string().trim().min(1).max(32).optional(),
-    metadata: jsonObject.optional(),
-  })
-  .strict();
+export const updateRecordingSchema = createRecordingSchema.partial().strict();
 
-export const createVersionSchema = z
-  .object({
-    activate: z.boolean().default(false),
-    source: z.string().trim().min(1).max(64).default('extension'),
-    schemaVersion: z.string().trim().min(1).max(32),
-    title: z.string().trim().max(255).nullable().optional(),
-    startUrl: z.string().trim().max(4096).nullable().optional(),
-    steps: z.array(z.unknown()).optional(),
-    recordingJson: jsonObject.optional(),
-    rawEventSummary: jsonObject.default({}),
-    validation: jsonObject.default({}),
-    metadata: jsonObject.default({}),
-  })
-  .passthrough();
-
-export const importRecordingSchema = z.object({
-  recording: createRecordingSchema,
-  version: createVersionSchema,
-});
+export const importRecordingSchema = createRecordingSchema;
 
 export const createReplaySchema = z.object({
-  versionId: z.string().uuid().nullable().optional(),
   status: z.string().trim().min(1).max(32),
   startedAt: z.coerce.date().nullable().optional(),
   endedAt: z.coerce.date().nullable().optional(),

@@ -1,18 +1,53 @@
-import { and, desc, eq, ilike, isNull, or, type SQL } from 'drizzle-orm';
+import { and, desc, eq, ilike, or, type SQL } from 'drizzle-orm';
 import { db } from '@/db';
-import { recordingVersions, recordings, replays } from '@/db/schema';
+import { recordings, replays } from '@/db/schema';
+
+export type DashboardReplay = {
+  id: string;
+  recordingId: string;
+  recordingName: string;
+  status: string;
+  startedAt: Date | null;
+  endedAt: Date | null;
+  durationMs: number | null;
+  error: Record<string, unknown> | null;
+  summary: Record<string, unknown>;
+  createdAt: Date;
+};
+
+export async function listDashboardReplays(userId: string): Promise<DashboardReplay[]> {
+  return db
+    .select({
+      id: replays.id,
+      recordingId: replays.recordingId,
+      recordingName: recordings.name,
+      status: replays.status,
+      startedAt: replays.startedAt,
+      endedAt: replays.endedAt,
+      durationMs: replays.durationMs,
+      error: replays.error,
+      summary: replays.summary,
+      createdAt: replays.createdAt,
+    })
+    .from(replays)
+    .innerJoin(recordings, eq(replays.recordingId, recordings.id))
+    .where(eq(recordings.userId, userId))
+    .orderBy(desc(replays.createdAt));
+}
 
 export type DashboardRecording = {
   id: string;
   name: string;
+  description: string | null;
   stepCount: number;
   updatedAt: Date;
   lastReplayAt: Date | null;
   status: string;
+  steps: unknown[];
 };
 
 export async function listDashboardRecordings(userId: string, search?: string) {
-  const filters: SQL[] = [eq(recordings.userId, userId), isNull(recordings.deletedAt)];
+  const filters: SQL[] = [eq(recordings.userId, userId)];
 
   if (search) {
     filters.push(
@@ -28,19 +63,6 @@ export async function listDashboardRecordings(userId: string, search?: string) {
 
   return Promise.all(
     rows.map(async (recording): Promise<DashboardRecording> => {
-      const [version] = recording.activeVersionId
-        ? await db
-            .select()
-            .from(recordingVersions)
-            .where(eq(recordingVersions.id, recording.activeVersionId))
-            .limit(1)
-        : await db
-            .select()
-            .from(recordingVersions)
-            .where(eq(recordingVersions.recordingId, recording.id))
-            .orderBy(desc(recordingVersions.versionNumber))
-            .limit(1);
-
       const [latestReplay] = await db
         .select()
         .from(replays)
@@ -51,11 +73,27 @@ export async function listDashboardRecordings(userId: string, search?: string) {
       return {
         id: recording.id,
         name: recording.name,
-        stepCount: version?.stepCount ?? 0,
+        description: recording.description || getDescription(recording.recordingJson),
+        stepCount: recording.stepCount,
         updatedAt: recording.updatedAt,
         lastReplayAt: latestReplay?.endedAt ?? latestReplay?.createdAt ?? null,
         status: latestReplay?.status ?? recording.status,
+        steps: getSteps(recording.recordingJson),
       };
     }),
   );
+}
+
+function getSteps(recordingJson: Record<string, unknown> | undefined) {
+  if (!recordingJson || !Array.isArray(recordingJson.steps)) {
+    return [];
+  }
+
+  return recordingJson.steps;
+}
+
+function getDescription(recordingJson: Record<string, unknown> | undefined) {
+  return typeof recordingJson?.description === 'string' && recordingJson.description.trim()
+    ? recordingJson.description
+    : null;
 }

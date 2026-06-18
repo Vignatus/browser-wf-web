@@ -29,8 +29,8 @@ export async function PATCH(request: Request, context: Context) {
 
 export async function DELETE(request: Request, context: Context) {
   return handleApi(async () => {
-    await requireAuth(request);
+    const user = await requireAuth(request);
     const params = recordingParamsSchema.parse(await context.params);
-    return deleteRecording(params.recordingId);
+    return deleteRecording(user.id, params.recordingId);
   });
 }

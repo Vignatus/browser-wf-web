@@ -1,5 +1,5 @@
 {
-  "id": "33c7962c-5220-4826-95a2-2a4db523594c",
+  "id": "7e2eaa68-c5bf-40a7-91e2-d673fde88a3f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -101,18 +101,52 @@
           "notNull": true,
           "default": "'active'"
         },
+        "source": {
+          "name": "source",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'extension'"
+        },
+        "start_url": {
+          "name": "start_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "step_count": {
+          "name": "step_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "recording_json": {
+          "name": "recording_json",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raw_event_summary": {
+          "name": "raw_event_summary",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "validation": {
+          "name": "validation",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
         "metadata": {
           "name": "metadata",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true,
           "default": "'{}'::jsonb"
-        },
-        "active_version_id": {
-          "name": "active_version_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -127,12 +161,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {
@@ -203,170 +231,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.recording_versions": {
-      "name": "recording_versions",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "recording_id": {
-          "name": "recording_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "version_number": {
-          "name": "version_number",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "source": {
-          "name": "source",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'extension'"
-        },
-        "schema_version": {
-          "name": "schema_version",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "title": {
-          "name": "title",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "start_url": {
-          "name": "start_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "step_count": {
-          "name": "step_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "recording_json": {
-          "name": "recording_json",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "raw_event_summary": {
-          "name": "raw_event_summary",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::jsonb"
-        },
-        "validation": {
-          "name": "validation",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::jsonb"
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::jsonb"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "recording_versions_recording_id_version_number_idx": {
-          "name": "recording_versions_recording_id_version_number_idx",
-          "columns": [
-            {
-              "expression": "recording_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "version_number",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "recording_versions_recording_id_idx": {
-          "name": "recording_versions_recording_id_idx",
-          "columns": [
-            {
-              "expression": "recording_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "recording_versions_created_at_idx": {
-          "name": "recording_versions_created_at_idx",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "recording_versions_recording_id_recordings_id_fk": {
-          "name": "recording_versions_recording_id_recordings_id_fk",
-          "tableFrom": "recording_versions",
-          "tableTo": "recordings",
-          "columnsFrom": [
-            "recording_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.replays": {
       "name": "replays",
       "schema": "",
@@ -383,12 +247,6 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "version_id": {
-          "name": "version_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
         },
         "status": {
           "name": "status",
@@ -472,21 +330,6 @@
           "method": "btree",
           "with": {}
         },
-        "replays_version_id_idx": {
-          "name": "replays_version_id_idx",
-          "columns": [
-            {
-              "expression": "version_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "replays_created_at_idx": {
           "name": "replays_created_at_idx",
           "columns": [
@@ -530,19 +373,6 @@
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "replays_version_id_recording_versions_id_fk": {
-          "name": "replays_version_id_recording_versions_id_fk",
-          "tableFrom": "replays",
-          "tableTo": "recording_versions",
-          "columnsFrom": [
-            "version_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

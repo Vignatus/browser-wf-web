@@ -9,21 +9,15 @@ import {
   updateReplaySchema,
 } from '@/validation';
 import { getRecordingOrThrow } from './recordings.service';
-import { getVersionOrThrow } from './versions.service';
 
 export async function createReplay(recordingId: string, input: unknown) {
   await getRecordingOrThrow(recordingId);
   const body = createReplaySchema.parse(input);
 
-  if (body.versionId) {
-    await getVersionOrThrow(recordingId, body.versionId);
-  }
-
   const [replay] = await db
     .insert(replays)
     .values({
       recordingId,
-      versionId: body.versionId ?? null,
       status: body.status,
       startedAt: body.startedAt ?? null,
       endedAt: body.endedAt ?? null,
